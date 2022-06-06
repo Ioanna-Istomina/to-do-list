@@ -3,10 +3,10 @@ const addBtn = document.querySelector(".addBtn");
 const list = document.querySelector("#myUL");
 
 addBtn.addEventListener("click", getValue);
-list.addEventListener("click", removeItem);
+list.addEventListener("click", checkItem);
 
 let items = [];
-getValueStorage();
+start();
 
 function getValue() {
   const value = input.value.trim();
@@ -35,32 +35,56 @@ function markupItem() {
   const markup = items
     .map(
       (item) =>
-        `<li>${item.value} <span class="close" data-id = ${item.id}>×</span></li>`
+        `<li class="item">${item.value} <span class="close" data-id = ${item.id}>×</span></li>`
     )
     .join("");
   list.innerHTML = markup;
 }
 
-function getValueStorage() {
-  const storageValue = JSON.parse(localStorage.getItem("value"));
-
-  if (!storageValue) {
-    return;
-  }
-  items = storageValue;
-
+function start() {
+  items = getValueStorage();
   markupItem();
 }
 
-function removeItem(ev) {
-  if (ev.target.classList.contains("close")) {
-    ev.target.parentElement.remove();
+function getValueStorage() {
+  const storageValue = JSON.parse(localStorage.getItem("value"));
+  return storageValue ?? [];
+}
 
-    items = items.filter((item) => {
-      console.log(item.id);
-      console.log(ev.target.dataset.id);
-      return item.id !== Number(ev.target.dataset.id);
-    });
-    localStorage.setItem("value", JSON.stringify(items));
+function removeItem(ev) {
+  ev.target.parentElement.remove();
+
+  items = items.filter((item) => {
+    console.log(item.id);
+    console.log(ev.target.dataset.id);
+    return item.id !== Number(ev.target.dataset.id);
+  });
+  localStorageSetItem();
+}
+
+function toggleClassChecked(ev) {
+  ev.target.classList.toggle("checked");
+
+  const closeBtn = ev.target.querySelector(".close");
+  const spanId = Number(closeBtn.dataset.id);
+  items = getValueStorage();
+  const currentItemObject = items.find((el) => el.id === spanId);
+
+  currentItemObject.checked = ev.target.classList.contains("checked");
+  localStorageSetItem();
+}
+
+function checkItem(ev) {
+  if (ev.target.classList.contains("close")) {
+    removeItem(ev);
+    return;
   }
+
+  if (ev.target.classList.contains("item")) {
+    toggleClassChecked(ev);
+  }
+}
+
+function localStorageSetItem() {
+  localStorage.setItem("value", JSON.stringify(items));
 }
