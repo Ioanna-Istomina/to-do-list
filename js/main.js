@@ -56,11 +56,7 @@ function removeItem(ev) {
   if (ev.target.classList.contains("close")) {
     ev.target.parentElement.remove();
 
-    items = items.filter((item) => {
-      console.log(item.id);
-      console.log(ev.target.dataset.id);
-      return item.id !== Number(ev.target.dataset.id);
-    });
+    items = items.filter((item) => item.id !== Number(ev.target.dataset.id));
     localStorage.setItem("value", JSON.stringify(items));
   }
 }
