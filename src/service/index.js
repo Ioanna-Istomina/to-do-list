@@ -2,11 +2,8 @@ import { initializeApp } from "firebase/app";
 import { getDatabase, ref, set, get, remove, update } from "firebase/database";
 import firebaseConfig from '../const/settings';
 
-
 const app = initializeApp(firebaseConfig);
 const db = getDatabase();
-
-
 
 function saveValueInFirebase(value = '') {
   const id = Date.now()
@@ -18,7 +15,6 @@ function saveValueInFirebase(value = '') {
     try{ set(ref(db, 'items/' + id), item);
     }
     catch(error) {console.log(error)}
- 
 }
 
 function getValueFromFirebase(url) {
