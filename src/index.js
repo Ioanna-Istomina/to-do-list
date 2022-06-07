@@ -10,6 +10,9 @@ import {
   filterItems,
   findElementById,
 } from './js/data';
+import {saveValueInFirebase, getValueFromFirebase, removeIten, updateItem} from "./service/index"
+
+
 
 addBtn.addEventListener('click', getValue);
 list.addEventListener('click', checkItem);
@@ -23,36 +26,38 @@ function getValue() {
   if (!value) {
     return;
   }
-  saveValueInLocalStorage(value, items);
+  saveValueInFirebase(value);
   start();
   input.value = '';
 }
 
 function start() {
-  items = getValueStorage();
-  const markup = markupItem(items);
-  console.log(markup);
+  getValueFromFirebase('items').then(data => {
+    const items = Object.values(data);
+    const markup = markupItem(items);
+    addMarkupPage(markup);
+  }).catch(error => console.log(error))
+  // items = getValueStorage();
+  
+  // console.log(markup);
 
-  addMarkupPage(markup);
+  
 }
 
 function removeItem(ev) {
   ev.target.parentElement.remove();
-
-  items = filterItems(items, ev.target.dataset.id);
-  localStorageSetItem(items);
+removeIten(`items/${ev.target.dataset.id}`)
+ 
 }
 
 function toggleClassChecked(ev) {
   ev.target.classList.toggle('checked');
-
+  const checked = ev.target.classList.contains('checked')
   const closeBtn = ev.target.querySelector('.close');
   const spanId = Number(closeBtn.dataset.id);
-  items = getValueStorage();
-  const currentItemObject = findElementById(items, spanId);
-
-  currentItemObject.checked = ev.target.classList.contains('checked');
-  localStorageSetItem(items);
+  updateItem(spanId, checked)
+ 
+  
 }
 
 function checkItem(ev) {
